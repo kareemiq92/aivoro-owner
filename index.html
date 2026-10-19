@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6a55e8">
+<link rel="manifest" href="owner.webmanifest">
+<link rel="apple-touch-icon" href="chef-192.png">
+<title>مطعمي · آيفورو</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&display=swap">
+<style>
+  /* The owner's page: his restaurant now, from anywhere. One column, big numbers, nothing to learn. */
+  :root { --v: #6a55e8; --ink: #14234d; --soft: #5d6b8f; --line: #e6e8f4; --ok: #12a474; --bad: #d9364f; --warn: #d88a00; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: 'Readex Pro', 'Segoe UI', Tahoma, sans-serif; color: var(--ink); background: linear-gradient(180deg, #ffffff, #f1f0fb 40%, #ebe9f8); min-height: 100dvh; }
+  main { max-width: 520px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  h1 { margin: 0; font-size: 24px; }
+  .live { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--soft); }
+  .live i { width: 10px; height: 10px; border-radius: 50%; background: #b9bfd3; }
+  .live.on i { background: var(--ok); box-shadow: 0 0 0 4px #12a47422; }
+  .card { background: #fff; border-radius: 24px; padding: 18px; margin-top: 12px; box-shadow: 0 10px 28px rgba(20, 35, 77, .07); }
+  .label { font-size: 15px; color: var(--soft); font-weight: 600; }
+  .big { font-size: 44px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+  .big small { font-size: 18px; color: var(--soft); font-weight: 600; }
+  .sub { font-size: 15px; color: var(--soft); margin-top: 6px; }
+  .hero { background: linear-gradient(150deg, #6a55e8, #8d79e6); color: #fff; }
+  .hero .label, .hero .sub, .hero .big small { color: #ffffffcc; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+  .tile { background: #fff; border-radius: 20px; padding: 14px 10px; text-align: center; box-shadow: 0 8px 22px rgba(20, 35, 77, .06); }
+  .tile b { display: block; font-size: 32px; line-height: 1.2; }
+  .tile span { font-size: 14px; color: var(--soft); font-weight: 600; }
+  .tile.bad b { color: var(--bad); }
+  .alerts { background: #fff1f3; border: 2px solid #f5c2cb; }
+  .alerts h2 { color: var(--bad); }
+  .alerts li { margin: 8px 0; font-size: 16px; line-height: 1.5; }
+  h2 { margin: 0 0 10px; font-size: 18px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .rows li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+  .rows li:last-child { border-bottom: 0; }
+  .rows b { font-weight: 700; white-space: nowrap; }
+  .num { direction: ltr; unicode-bidi: isolate; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 130px; margin-top: 8px; }
+  .bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
+  .bar i { width: 100%; border-radius: 10px 10px 4px 4px; background: #d9d3fb; min-height: 4px; }
+  .bar.today i { background: var(--v); }
+  .bar span { font-size: 12px; color: var(--soft); }
+  .gate { text-align: center; padding-top: 12vh; }
+  .gate img { width: 84px; }
+  .gate h1 { font-size: 28px; margin-top: 12px; }
+  .gate p { color: var(--soft); font-size: 16px; line-height: 1.6; }
+  input { width: 100%; font: 700 22px 'Readex Pro', sans-serif; text-align: center; letter-spacing: 2px; direction: ltr; padding: 16px; border-radius: 18px; border: 2px solid var(--line); background: #fff; color: var(--ink); text-transform: uppercase; }
+  input:focus { outline: none; border-color: var(--v); }
+  button { font: 700 19px 'Readex Pro', sans-serif; border: 0; border-radius: 18px; padding: 16px; width: 100%; margin-top: 12px; background: var(--v); color: #fff; touch-action: manipulation; }
+  button:active { transform: scale(.98); }
+  button.quiet { background: transparent; color: var(--soft); font-size: 15px; font-weight: 600; }
+  .error { color: var(--bad); min-height: 24px; margin-top: 10px; }
+  .wait { text-align: center; color: var(--soft); padding: 40px 0; font-size: 17px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+// The summary the restaurant's main machine leaves every minute on two public relays, sealed with the owner's code
+// (src/main/owner.ts). Read here over MQTT on a secure web socket, opened with the same code, never sent anywhere.
+const RELAYS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt']
+const $ = (id) => document.getElementById(id)
+const iqd = (n) => Math.round(n || 0).toLocaleString('en-US')
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const clean = (code) => code.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
+const stored = { get: () => { try { return localStorage.getItem('aivoro-owner') || '' } catch { return '' } }, set: (v) => { try { v ? localStorage.setItem('aivoro-owner', v) : localStorage.removeItem('aivoro-owner') } catch {} } }
+
+// ---- the code: the room's name and the key are both made from it
+async function open(code) {
+  const enc = new TextEncoder()
+  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode('owner:' + clean(code))))
+  const topic = 'aivoro/owner/' + [...hash].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 24)
+  const base = await crypto.subtle.importKey('raw', enc.encode(clean(code)), 'PBKDF2', false, ['deriveKey'])
+  const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode('aivoro-owner'), iterations: 120000 }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt'])
+  return { topic, key }
+}
+async function unseal(key, bytes) {
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, key, bytes.slice(12))
+  const text = await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()
+  return JSON.parse(text)
+}
+
+// ---- the relays' language (MQTT 3.1.1 on a web socket), only what listening needs
+const str = (s) => { const b = new TextEncoder().encode(s); return [b.length >> 8, b.length & 255, ...b] }
+const pkt = (kind, body) => { const len = []; let n = body.length; do { let d = n % 128; n = Math.floor(n / 128); len.push(n > 0 ? d | 128 : d) } while (n > 0); return new Uint8Array([kind, ...len, ...body]) }
+function listen(url, topic, onMessage) {
+  let ws, ping
+  const start = () => {
+    ws = new WebSocket(url, 'mqtt')
+    ws.binaryType = 'arraybuffer'
+    let buffer = new Uint8Array(0)
+    ws.onopen = () => {
+      ws.send(pkt(0x10, [...str('MQTT'), 4, 2, 0, 60, ...str('owner-' + Math.random().toString(36).slice(2, 10))]))
+      ws.send(pkt(0x82, [0, 1, ...str(topic), 0]))
+      ping = setInterval(() => ws.readyState === 1 && ws.send(new Uint8Array([0xc0, 0])), 45000)
+    }
+    ws.onmessage = (event) => {
+      const chunk = new Uint8Array(event.data)
+      const joined = new Uint8Array(buffer.length + chunk.length); joined.set(buffer); joined.set(chunk, buffer.length); buffer = joined
+      for (;;) {
+        let len = 0, shift = 0, i = 1, d
+        do { if (i >= buffer.length) return; d = buffer[i++]; len |= (d & 127) << shift; shift += 7 } while (d & 128)
+        if (buffer.length < i + len) return
+        const kind = buffer[0], body = buffer.slice(i, i + len)
+        buffer = buffer.slice(i + len)
+        if ((kind & 0xf0) === 0x30) { const tl = (body[0] << 8) | body[1]; onMessage(body.slice(2 + tl + ((kind & 6) ? 2 : 0))) }
+      }
+    }
+    ws.onclose = () => { clearInterval(ping); setTimeout(start, 5000) }
+  }
+  start()
+}
+
+// ---- what the page says
+const FLAGS = {
+  VOIDS: (f) => `${f.n} ألغى ${f.x} مرات بعد الإرسال للمطبخ، أكثر من ضعف الباقين.`,
+  DISCOUNTS: (f) => `${f.n} منح ${f.x} خصومات، أكثر من ضعف الباقين.`,
+  HOSPITALITY: (f) => `${f.n} سجّل ${f.x} ضيافات، أكثر من ضعف الباقين.`,
+  DRAWER: (f) => `${f.n} فتح الدرج ${f.x} مرات بلا بيع.`,
+  REPRINT: (f) => `${f.n} أعاد طباعة فواتير مدفوعة ${f.x} مرات.`,
+  REFUSED: (f) => `${f.n} أدخل كلمة مرور المدير خطأً ${f.x} مرات.`,
+  EXPENSES: (f) => `${f.n} عُدّلت أو حُذفت مصاريفه ${f.x} مرات.`,
+  SHORT: (f) => `درج ${f.n} نقص ${iqd(f.x)} د.ع.`,
+}
+const DOWN = { net: 'الحاسبة الرئيسية بلا شبكة', printer: 'طابعة لا تعمل', phone: 'هاتف الطلبات منقطع', station: 'حاسبة كاشير منقطعة', screen: 'شاشة منقطعة', internet: 'لا إنترنت في المطعم', backup: 'النسخ الاحتياطي' }
+const DAYS = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت']
+let last = null
+
+function gate(error = '') {
+  $('app').innerHTML = `<div class="gate"><img src="chef-192.png" alt=""><h1>مطعمي</h1>
+    <p>اكتب رمز صاحب المطعم.<br>تجده في البرنامج: مكتب المدير ← التطبيقات ← صفحة صاحب المطعم.</p>
+    <input id="code" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go">
+    <button id="go">افتح</button><div class="error">${esc(error)}</div></div>`
+  $('go').onclick = () => { const c = $('code').value; if (clean(c).length !== 12) return gate('الرمز 12 حرفاً ورقماً.'); stored.set(c); start(c) }
+  $('code').onkeydown = (e) => e.key === 'Enter' && $('go').click()
+}
+
+function render(s) {
+  const d = s.day, n = s.now
+  const ago = Math.max(0, Math.round((Date.now() - Date.parse(s.at)) / 60000))
+  const alerts = [...s.flags.map((f) => (FLAGS[f.c] || (() => ''))(f)), ...s.down.map((r) => `${DOWN[r.k] || 'جهاز لا يعمل'}${r.n ? ': ' + r.n : ''}`)].filter(Boolean)
+  const max = Math.max(1, ...s.week.map((w) => w.s))
+  $('app').innerHTML = `
+    <header><h1>${esc(s.name || 'مطعمي')}</h1><span class="live ${ago < 3 ? 'on' : ''}"><i></i>${ago < 1 ? 'الآن' : ago < 3 ? `قبل ${ago} د` : `آخر تحديث قبل ${ago} د`}</span></header>
+    ${ago >= 3 ? '<div class="card alerts"><h2>البرنامج لا يرسل الآن</h2><ul><li>الحاسبة الرئيسية مطفأة، أو لا إنترنت في المطعم. الأرقام أدناه آخر ما وصل.</li></ul></div>' : ''}
+    <div class="card hero"><div class="label">مبيعات اليوم</div><div class="big"><span class="num">${iqd(d.sales)}</span> <small>د.ع</small></div>
+      <div class="sub">${d.orders} طلب${d.orders ? ` · المعدل <span class="num">${iqd(d.sales / d.orders)}</span> د.ع` : ''}</div></div>
+    <div class="tiles">
+      <div class="tile"><b>${n.open}</b><span>مفتوحة الآن</span></div>
+      <div class="tile ${n.late ? 'bad' : ''}"><b>${n.cooking}</b><span>${n.late ? `بالمطبخ · ${n.late} متأخر` : 'بالمطبخ'}</span></div>
+      <div class="tile"><b>${n.out}</b><span>مع السائقين</span></div>
+    </div>
+    ${alerts.length ? `<div class="card alerts"><h2>انتبه</h2><ul>${alerts.map((a) => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}
+    <div class="card"><h2>الدفع</h2><ul class="rows">
+      <li><span>نقد</span><b class="num">${iqd(d.cash)}</b></li>
+      <li><span>بطاقة</span><b class="num">${iqd(d.card)}</b></li>
+      ${d.usd ? `<li><span>دولار (بالدينار)</span><b class="num">${iqd(d.usd)}</b></li>` : ''}
+      ${d.debt ? `<li><span>دَين على الزبائن</span><b class="num">${iqd(d.debt)}</b></li>` : ''}
+      <li><span>صالة · سفري · توصيل</span><b class="num">${iqd(d.dinein)} · ${iqd(d.takeaway)} · ${iqd(d.delivery)}</b></li>
+    </ul></div>
+    <div class="card"><h2>الربح والخسائر اليوم</h2><ul class="rows">
+      <li><span>كلفة المواد</span><b class="num">${iqd(d.cost)}</b></li>
+      <li><span>الربح قبل المصاريف</span><b class="num">${iqd(d.sales - d.cost)}</b></li>
+      <li><span>الخصومات</span><b class="num">${iqd(d.discounts)}</b></li>
+      <li><span>الضيافة</span><b class="num">${iqd(d.hospitality)}</b></li>
+      <li><span>الإلغاءات</span><b>${d.voids}</b></li>
+    </ul></div>
+    ${s.top.length ? `<div class="card"><h2>الأكثر مبيعاً اليوم</h2><ul class="rows">${s.top.map((t) => `<li><span>${esc(t.n)}</span><b>× ${t.q}</b></li>`).join('')}</ul></div>` : ''}
+    <div class="card"><h2>آخر 7 أيام</h2><div class="bars">${s.week.map((w, i) => `<div class="bar ${i === s.week.length - 1 ? 'today' : ''}"><i style="height:${Math.round((w.s / max) * 100)}%"></i><span>${DAYS[new Date(w.d + 'T12:00').getDay()]}</span></div>`).join('')}</div>
+      <div class="sub">المجموع <span class="num">${iqd(s.week.reduce((a, w) => a + w.s, 0))}</span> د.ع</div></div>
+    <div class="card"><h2>الموظفون الحاضرون (${s.staff.length})</h2><ul class="rows">${s.staff.length ? s.staff.map((p) => `<li><span>${esc(p.n)}</span><b class="num">${esc(p.in)}${p.out ? ' → ' + esc(p.out) : ''}</b></li>`).join('') : '<li><span>لم يبصم أحد بعد</span></li>'}</ul></div>
+    <button class="quiet" id="out">تغيير الرمز</button>`
+  $('out').onclick = () => (stored.set(''), location.reload())
+}
+
+async function start(code) {
+  if (!window.crypto?.subtle || !window.DecompressionStream) return gate('افتح الصفحة من رابطها الآمن (https) وبمتصفح حديث.')
+  $('app').innerHTML = '<div class="wait">أتصل بالمطعم…</div>'
+  const { topic, key } = await open(code)
+  let any = false
+  setTimeout(() => !any && ($('app').innerHTML = '<div class="wait">لم يصل شيء بعد. تأكد من الرمز، وأن «صفحة صاحب المطعم» مفعّلة في البرنامج والحاسبة الرئيسية تعمل وعليها إنترنت.<br><br><button class="quiet" onclick="localStorage.removeItem(\'aivoro-owner\');location.reload()">تغيير الرمز</button></div>'), 15000)
+  for (const url of RELAYS)
+    listen(url, topic, async (bytes) => {
+      try {
+        const s = await unseal(key, bytes)
+        if (last && Date.parse(s.at) < Date.parse(last.at)) return
+        any = true
+        last = s
+        render(s)
+      } catch {}
+    })
+  // The age shown keeps counting between messages.
+  setInterval(() => last && render(last), 30000)
+}
+
+// Opened from the square code in the program: the code comes in the link, is kept, and leaves the address bar.
+const given = new URLSearchParams(location.hash.slice(1)).get('c')
+if (given) (stored.set(given), history.replaceState(null, '', location.pathname))
+const saved = stored.get()
+saved ? start(saved) : gate()
+</script>
+</body>
+</html>
