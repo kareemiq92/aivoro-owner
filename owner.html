@@ -55,6 +55,16 @@
   input:focus { outline: none; border-color: var(--v); }
   button { font: 700 19px 'Readex Pro', sans-serif; border: 0; border-radius: 18px; padding: 16px; width: 100%; margin-top: 12px; background: var(--v); color: #fff; touch-action: manipulation; }
   button:active { transform: scale(.98); }
+  @media (min-width: 900px) {
+    main { max-width: 1180px; padding: 28px 32px 40px; }
+    .top { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: stretch; }
+    .top .card, .top .tiles { margin-top: 0; }
+    .top .tiles { grid-template-columns: 1fr 1fr; }
+    .top .tile:first-child { grid-column: 1 / -1; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; margin-top: 16px; }
+    .grid .card { margin-top: 0; }
+    #out { max-width: 320px; display: block; margin: 16px auto 0; }
+  }
   button.quiet { background: transparent; color: var(--soft); font-size: 15px; font-weight: 600; }
   .error { color: var(--bad); min-height: 24px; margin-top: 10px; }
   .wait { text-align: center; color: var(--soft); padding: 40px 0; font-size: 17px; }
@@ -151,15 +161,15 @@ function render(s) {
   $('app').innerHTML = `
     <header><h1>${esc(s.name || 'مطعمي')}</h1><span class="live ${ago < 3 ? 'on' : ''}"><i></i>${ago < 1 ? 'الآن' : ago < 3 ? `قبل ${ago} د` : `آخر تحديث قبل ${ago} د`}</span></header>
     ${ago >= 3 ? '<div class="card alerts"><h2>البرنامج لا يرسل الآن</h2><ul><li>الحاسبة الرئيسية مطفأة، أو لا إنترنت في المطعم. الأرقام أدناه آخر ما وصل.</li></ul></div>' : ''}
-    <div class="card hero"><div class="label">مبيعات اليوم</div><div class="big"><span class="num">${iqd(d.sales)}</span> <small>د.ع</small></div>
+    <div class="top"><div class="card hero"><div class="label">مبيعات اليوم</div><div class="big"><span class="num">${iqd(d.sales)}</span> <small>د.ع</small></div>
       <div class="sub">${d.orders} طلب${d.orders ? ` · المعدل <span class="num">${iqd(d.sales / d.orders)}</span> د.ع` : ''}</div></div>
     <div class="tiles">
       <div class="tile"><b>${n.open}</b><span>مفتوحة الآن</span></div>
       <div class="tile ${n.late ? 'bad' : ''}"><b>${n.cooking}</b><span>${n.late ? `بالمطبخ · ${n.late} متأخر` : 'بالمطبخ'}</span></div>
       <div class="tile"><b>${n.out}</b><span>مع السائقين</span></div>
-    </div>
+    </div></div>
     ${alerts.length ? `<div class="card alerts"><h2>انتبه</h2><ul>${alerts.map((a) => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}
-    <div class="card"><h2>الدفع</h2><ul class="rows">
+    <div class="grid"><div class="card"><h2>الدفع</h2><ul class="rows">
       <li><span>نقد</span><b class="num">${iqd(d.cash)}</b></li>
       <li><span>بطاقة</span><b class="num">${iqd(d.card)}</b></li>
       ${d.usd ? `<li><span>دولار (بالدينار)</span><b class="num">${iqd(d.usd)}</b></li>` : ''}
@@ -176,7 +186,7 @@ function render(s) {
     ${s.top.length ? `<div class="card"><h2>الأكثر مبيعاً اليوم</h2><ul class="rows">${s.top.map((t) => `<li><span>${esc(t.n)}</span><b>× ${t.q}</b></li>`).join('')}</ul></div>` : ''}
     <div class="card"><h2>آخر 7 أيام</h2><div class="bars">${s.week.map((w, i) => `<div class="bar ${i === s.week.length - 1 ? 'today' : ''}"><i style="height:${Math.round((w.s / max) * 100)}%"></i><span>${DAYS[new Date(w.d + 'T12:00').getDay()]}</span></div>`).join('')}</div>
       <div class="sub">المجموع <span class="num">${iqd(s.week.reduce((a, w) => a + w.s, 0))}</span> د.ع</div></div>
-    <div class="card"><h2>الموظفون الحاضرون (${s.staff.length})</h2><ul class="rows">${s.staff.length ? s.staff.map((p) => `<li><span>${esc(p.n)}</span><b class="num">${esc(p.in)}${p.out ? ' → ' + esc(p.out) : ''}</b></li>`).join('') : '<li><span>لم يبصم أحد بعد</span></li>'}</ul></div>
+    <div class="card"><h2>الموظفون الحاضرون (${s.staff.length})</h2><ul class="rows">${s.staff.length ? s.staff.map((p) => `<li><span>${esc(p.n)}</span><b class="num">${esc(p.in)}${p.out ? ' → ' + esc(p.out) : ''}</b></li>`).join('') : '<li><span>لم يبصم أحد بعد</span></li>'}</ul></div></div>
     <button class="quiet" id="out">تغيير الرمز</button>`
   $('out').onclick = () => (stored.set(''), location.reload())
 }
