@@ -10,43 +10,61 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&display=swap">
 <style>
-  /* The owner's page: his restaurant now, from anywhere. One column, big numbers, nothing to learn. */
+  /* The owner's page: his restaurant now, from anywhere. One card per subject, the screen's full width, its result at its foot. */
   :root { --v: #6a55e8; --ink: #14234d; --soft: #5d6b8f; --line: #e6e8f4; --ok: #12a474; --bad: #d9364f; --warn: #d88a00; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
   body { margin: 0; font-family: 'Readex Pro', 'Segoe UI', Tahoma, sans-serif; color: var(--ink); background: linear-gradient(180deg, #ffffff, #f1f0fb 40%, #ebe9f8); min-height: 100dvh; }
-  main { max-width: 520px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom)); }
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  main { max-width: 760px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom)); }
+  header.page { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 4px 14px; }
   h1 { margin: 0; font-size: 24px; }
   .live { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--soft); }
   .live i { width: 10px; height: 10px; border-radius: 50%; background: #b9bfd3; }
   .live.on i { background: var(--ok); box-shadow: 0 0 0 4px #12a47422; }
-  .card { background: #fff; border-radius: 24px; padding: 18px; margin-top: 12px; box-shadow: 0 10px 28px rgba(20, 35, 77, .07); }
-  .label { font-size: 15px; color: var(--soft); font-weight: 600; }
-  .big { font-size: 44px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+  .card { background: #fff; border-radius: 26px; margin-top: 14px; box-shadow: 0 10px 28px rgba(20, 35, 77, .07); overflow: hidden; }
+  .card h2 { margin: 0; padding: 18px 20px 4px; font-size: 19px; display: flex; align-items: center; gap: 10px; }
+  .card h2 i { font-style: normal; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: #f0edff; font-size: 19px; }
+  .card .note { padding: 0 20px; font-size: 14px; color: var(--soft); }
+  .body { padding: 6px 20px 14px; }
+  .total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 20px; background: #f5f3ff; border-top: 1px solid #ebe7ff; }
+  .total > span { font-size: 16px; font-weight: 600; color: var(--soft); }
+  .total b { font-size: 26px; color: var(--v); white-space: nowrap; }
+  .total.ok { background: #ecfaf4; border-color: #d3f2e5; } .total.ok b { color: var(--ok); }
+  .total.bad { background: #fff1f3; border-color: #fbd9df; } .total.bad b { color: var(--bad); }
+  .total small { font-size: 15px; font-weight: 600; }
+  .big { font-size: 46px; font-weight: 700; line-height: 1.1; padding: 4px 20px 0; }
   .big small { font-size: 18px; color: var(--soft); font-weight: 600; }
-  .sub { font-size: 15px; color: var(--soft); margin-top: 6px; }
-  .hero { background: linear-gradient(150deg, #6a55e8, #8d79e6); color: #fff; }
-  .hero .label, .hero .sub, .hero .big small { color: #ffffffcc; }
-  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
-  .tile { background: #fff; border-radius: 20px; padding: 14px 10px; text-align: center; box-shadow: 0 8px 22px rgba(20, 35, 77, .06); }
-  .tile b { display: block; font-size: 32px; line-height: 1.2; }
-  .tile span { font-size: 14px; color: var(--soft); font-weight: 600; }
-  .tile.bad b { color: var(--bad); }
+  .trend { display: inline-block; margin: 8px 20px 0; padding: 4px 10px; border-radius: 99px; font-size: 14px; font-weight: 700; }
+  .trend.up { background: #ecfaf4; color: var(--ok); } .trend.down { background: #fff1f3; color: var(--bad); }
   .alerts { background: #fff1f3; border: 2px solid #f5c2cb; }
   .alerts h2 { color: var(--bad); }
+  .alerts h2 i { background: #ffdde3; }
   .alerts li { margin: 8px 0; font-size: 16px; line-height: 1.5; }
-  h2 { margin: 0 0 10px; font-size: 18px; }
   ul { list-style: none; margin: 0; padding: 0; }
-  .rows li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+  .rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
   .rows li:last-child { border-bottom: 0; }
   .rows b { font-weight: 700; white-space: nowrap; }
+  .rows small { display: block; font-size: 13px; color: var(--soft); margin-top: 2px; }
+  .rows li.bad, .rows li.bad b { color: var(--bad); }
+  .rows b.out { color: var(--bad); }
+  .rows li.off { color: #9aa3bd; }
+  .tag { font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: #eef0f7; color: var(--soft); white-space: nowrap; }
+  .tag.bad { background: #ffe3e8; color: var(--bad); } .tag.ok { background: #e3f6ee; color: var(--ok); }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 8px 20px 16px; }
+  .trio div { background: #f7f6fd; border-radius: 18px; padding: 12px 6px; text-align: center; }
+  .trio b { display: block; font-size: 26px; line-height: 1.2; }
+  .trio span { font-size: 13px; color: var(--soft); font-weight: 600; }
+  .trio .bad b { color: var(--bad); }
+  details summary { cursor: pointer; list-style: none; text-align: center; color: var(--v); font-weight: 700; font-size: 15px; padding: 10px 0 2px; }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary { display: none; }
   .num { direction: ltr; unicode-bidi: isolate; }
-  .bars { display: flex; align-items: flex-end; gap: 8px; height: 130px; margin-top: 8px; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin: 6px 20px 14px; }
   .bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 6px; }
   .bar i { width: 100%; border-radius: 10px 10px 4px 4px; background: #d9d3fb; min-height: 4px; }
   .bar.today i { background: var(--v); }
   .bar span { font-size: 12px; color: var(--soft); }
+  .empty { color: var(--soft); font-size: 16px; padding: 8px 0; }
   .gate { text-align: center; padding-top: 12vh; }
   .gate img { width: 84px; }
   .gate h1 { font-size: 28px; margin-top: 12px; }
@@ -55,16 +73,6 @@
   input:focus { outline: none; border-color: var(--v); }
   button { font: 700 19px 'Readex Pro', sans-serif; border: 0; border-radius: 18px; padding: 16px; width: 100%; margin-top: 12px; background: var(--v); color: #fff; touch-action: manipulation; }
   button:active { transform: scale(.98); }
-  @media (min-width: 900px) {
-    main { max-width: 1180px; padding: 28px 32px 40px; }
-    .top { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: stretch; }
-    .top .card, .top .tiles { margin-top: 0; }
-    .top .tiles { grid-template-columns: 1fr 1fr; }
-    .top .tile:first-child { grid-column: 1 / -1; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; margin-top: 16px; }
-    .grid .card { margin-top: 0; }
-    #out { max-width: 320px; display: block; margin: 16px auto 0; }
-  }
   button.quiet { background: transparent; color: var(--soft); font-size: 15px; font-weight: 600; }
   .error { color: var(--bad); min-height: 24px; margin-top: 10px; }
   .wait { text-align: center; color: var(--soft); padding: 40px 0; font-size: 17px; }
@@ -153,41 +161,110 @@ function gate(error = '') {
   $('code').onkeydown = (e) => { if (e.key === 'Enter') $('go').click() }
 }
 
+const TYPES = { dinein: 'صالة', takeaway: 'سفري', delivery: 'توصيل' }
+const ACTS = { order_voided: 'ألغى الفاتورة', line_voided: 'ألغى صنفاً من الفاتورة', discount: 'خصم على الفاتورة', hospitality: 'ضيافة على الفاتورة', order_refunded: 'أرجع الفاتورة', line_refunded: 'أرجع صنفاً من الفاتورة' }
+const UNITS = { g: ['غم', 'كغم'], ml: ['مل', 'لتر'], piece: ['قطعة', 'قطعة'] }
+const qty = (q, u) => { const [small, large] = UNITS[u] || ['', '']; return u !== 'piece' && Math.abs(q) >= 1000 ? `${+(q / 1000).toFixed(1)} ${large}` : `${Math.round(q)} ${small}` }
+const clock = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+const money = (n) => `<span class="num">${iqd(n)}</span> <small>د.ع</small>`
+const card = (icon, title, body, total = '', cls = '', note = '') => `<section class="card ${cls}"><h2><i>${icon}</i>${title}</h2>${note ? `<p class="note">${note}</p>` : ''}${body}${total}</section>`
+const foot = (label, value, tone = '') => `<div class="total ${tone}"><span>${label}</span><b>${value}</b></div>`
+const rows = (items, empty) => `<div class="body"><ul class="rows">${items.length ? items.join('') : `<li class="empty">${empty}</li>`}</ul></div>`
+// A long list shows its first rows; the rest wait behind one press, and stay open across the minute's refresh.
+const more = (key, items, empty, first = 8) =>
+  items.length <= first + 2 ? rows(items, empty) : `<div class="body"><ul class="rows">${items.slice(0, first).join('')}</ul><details data-k="${key}"><summary>عرض الكل (${items.length})</summary><ul class="rows">${items.slice(first).join('')}</ul></details></div>`
+
 function render(s) {
+  if (s.v < 2) return ($('app').innerHTML = '<div class="wait">حدّث برنامج آيفورو في المطعم لتظهر هذه الصفحة كاملة.</div>')
+  const opened = [...document.querySelectorAll('details[open]')].map((x) => x.dataset.k)
   const d = s.day, n = s.now
   const ago = Math.max(0, Math.round((Date.now() - Date.parse(s.at)) / 60000))
   const alerts = [...s.flags.map((f) => (FLAGS[f.c] || (() => ''))(f)), ...s.down.map((r) => `${DOWN[r.k] || 'جهاز لا يعمل'}${r.n ? ': ' + r.n : ''}`)].filter(Boolean)
-  const max = Math.max(1, ...s.week.map((w) => w.s))
+  if (ago >= 3) alerts.unshift(`البرنامج لا يرسل منذ ${ago} دقيقة: الحاسبة الرئيسية مطفأة أو بلا إنترنت. الأرقام أدناه آخر ما وصل.`)
+  const change = d.prev > 0 ? Math.round(((d.sales - d.prev) / d.prev) * 100) : null
+  const present = s.staff.filter((p) => p.k === 'present'), lateStaff = present.filter((p) => p.l > 0)
+  const shortLast = s.cash.last && s.cash.last.d !== 0
+  const lows = s.stock.items.filter((m) => m.low)
+  const max = Math.max(1, ...s.sales.bars.map((w) => w.s))
+  const m = s.month
+
   $('app').innerHTML = `
-    <header><h1>${esc(s.name || 'مطعمي')}</h1><span class="live ${ago < 3 ? 'on' : ''}"><i></i>${ago < 1 ? 'الآن' : ago < 3 ? `قبل ${ago} د` : `آخر تحديث قبل ${ago} د`}</span></header>
-    ${ago >= 3 ? '<div class="card alerts"><h2>البرنامج لا يرسل الآن</h2><ul><li>الحاسبة الرئيسية مطفأة، أو لا إنترنت في المطعم. الأرقام أدناه آخر ما وصل.</li></ul></div>' : ''}
-    <div class="top"><div class="card hero"><div class="label">مبيعات اليوم</div><div class="big"><span class="num">${iqd(d.sales)}</span> <small>د.ع</small></div>
-      <div class="sub">${d.orders} طلب${d.orders ? ` · المعدل <span class="num">${iqd(d.sales / d.orders)}</span> د.ع` : ''}</div></div>
-    <div class="tiles">
-      <div class="tile"><b>${n.open}</b><span>مفتوحة الآن</span></div>
-      <div class="tile ${n.late ? 'bad' : ''}"><b>${n.cooking}</b><span>${n.late ? `بالمطبخ · ${n.late} متأخر` : 'بالمطبخ'}</span></div>
-      <div class="tile"><b>${n.out}</b><span>مع السائقين</span></div>
-    </div></div>
-    ${alerts.length ? `<div class="card alerts"><h2>انتبه</h2><ul>${alerts.map((a) => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}
-    <div class="grid"><div class="card"><h2>الدفع</h2><ul class="rows">
-      <li><span>نقد</span><b class="num">${iqd(d.cash)}</b></li>
-      <li><span>بطاقة</span><b class="num">${iqd(d.card)}</b></li>
-      ${d.usd ? `<li><span>دولار (بالدينار)</span><b class="num">${iqd(d.usd)}</b></li>` : ''}
-      ${d.debt ? `<li><span>دَين على الزبائن</span><b class="num">${iqd(d.debt)}</b></li>` : ''}
-      <li><span>صالة · سفري · توصيل</span><b class="num">${iqd(d.dinein)} · ${iqd(d.takeaway)} · ${iqd(d.delivery)}</b></li>
-    </ul></div>
-    <div class="card"><h2>الربح والخسائر اليوم</h2><ul class="rows">
-      <li><span>كلفة المواد</span><b class="num">${iqd(d.cost)}</b></li>
-      <li><span>الربح قبل المصاريف</span><b class="num">${iqd(d.sales - d.cost)}</b></li>
-      <li><span>الخصومات</span><b class="num">${iqd(d.discounts)}</b></li>
-      <li><span>الضيافة</span><b class="num">${iqd(d.hospitality)}</b></li>
-      <li><span>الإلغاءات</span><b>${d.voids}</b></li>
-    </ul></div>
-    ${s.top.length ? `<div class="card"><h2>الأكثر مبيعاً اليوم</h2><ul class="rows">${s.top.map((t) => `<li><span>${esc(t.n)}</span><b>× ${t.q}</b></li>`).join('')}</ul></div>` : ''}
-    <div class="card"><h2>آخر 7 أيام</h2><div class="bars">${s.week.map((w, i) => `<div class="bar ${i === s.week.length - 1 ? 'today' : ''}"><i style="height:${Math.round((w.s / max) * 100)}%"></i><span>${DAYS[new Date(w.d + 'T12:00').getDay()]}</span></div>`).join('')}</div>
-      <div class="sub">المجموع <span class="num">${iqd(s.week.reduce((a, w) => a + w.s, 0))}</span> د.ع</div></div>
-    <div class="card"><h2>الموظفون الحاضرون (${s.staff.length})</h2><ul class="rows">${s.staff.length ? s.staff.map((p) => `<li><span>${esc(p.n)}</span><b class="num">${esc(p.in)}${p.out ? ' → ' + esc(p.out) : ''}</b></li>`).join('') : '<li><span>لم يبصم أحد بعد</span></li>'}</ul></div></div>
+    <header class="page"><h1>${esc(s.name || 'مطعمي')}</h1><span class="live ${ago < 3 ? 'on' : ''}"><i></i>${ago < 1 ? 'الآن' : `قبل ${ago} د`}</span></header>
+
+    ${alerts.length ? card('⚠️', 'انتبه', `<div class="body"><ul>${alerts.map((a) => `<li>${esc(a)}</li>`).join('')}</ul></div>`, '', 'alerts') : ''}
+
+    ${card('💰', 'مبيعات اليوم',
+      `<div class="big">${money(d.sales)}</div>${change === null ? '' : `<span class="trend ${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}% عن نفس اليوم من الأسبوع الماضي</span>`}
+      ${rows([
+        `<li><span>نقد</span><b class="num">${iqd(d.cash)}</b></li>`,
+        `<li><span>بطاقة</span><b class="num">${iqd(d.card)}</b></li>`,
+        ...(d.usd ? [`<li><span>دولار (بالدينار)</span><b class="num">${iqd(d.usd)}</b></li>`] : []),
+        ...(d.debt ? [`<li><span>آجل على الزبائن</span><b class="num">${iqd(d.debt)}</b></li>`] : []),
+        `<li><span>صالة · سفري · توصيل</span><b class="num">${iqd(d.dinein)} · ${iqd(d.takeaway)} · ${iqd(d.delivery)}</b></li>`
+      ], '')}`,
+      foot(`${d.orders} طلب${d.orders ? ` · المعدل ${iqd(d.sales / d.orders)} د.ع` : ''}`, money(d.sales)))}
+
+    ${card('🍽️', 'الطلبات الآن',
+      `<div class="trio"><div><b>${n.open}</b><span>مفتوحة</span></div><div class="${n.late.length ? 'bad' : ''}"><b>${n.cooking}</b><span>في المطبخ</span></div><div><b>${n.out}</b><span>مع السائقين</span></div></div>
+      ${n.late.length ? more('late', n.late.map((o) => `<li class="bad"><span>طلب ${o.n} · ${TYPES[o.t] || ''}</span><b>متأخر ${o.m} د</b></li>`), '', 5) : ''}`,
+      n.late.length ? foot('طلبات متأخرة', n.late.length, 'bad') : foot('طلبات متأخرة', 'لا يوجد', 'ok'))}
+
+    ${card('🧾', 'الصندوق',
+      rows([
+        ...s.cash.open.map((c) => `<li><span>درج ${esc(c.n)}<small>مفتوح الآن · يجب أن يكون فيه</small></span><b class="num">${iqd(c.x)}</b></li>`),
+        ...(s.cash.last ? [`<li class="${shortLast ? 'bad' : ''}"><span>آخر إغلاق: ${esc(s.cash.last.n)}<small>${clock(s.cash.last.at)}</small></span><b>${s.cash.last.d === 0 ? 'مطابق' : `${s.cash.last.d < 0 ? 'نقص' : 'زيادة'} <span class="num">${iqd(Math.abs(s.cash.last.d))}</span>`}</b></li>`] : []),
+        `<li><span>الخزنة</span><b class="num">${iqd(s.cash.safe)}</b></li>`
+      ], 'لا درج مفتوح'),
+      foot('النقد في الأدراج الآن', money(s.cash.open.reduce((a, c) => a + c.x, 0)), shortLast ? 'bad' : ''))}
+
+    ${card('✂️', 'الإلغاءات والخصومات والضيافة',
+      more('watch', s.watch.map((w) => `<li class="${w.a.includes('void') || w.a.includes('refund') ? 'bad' : ''}"><span>${esc(w.n)}: ${ACTS[w.a] || w.a} ${esc(w.o)}${w.d ? `<small>${esc(w.d)}</small>` : ''}</span><b class="num">${clock(w.at)}</b></li>`), 'لا شيء اليوم', 6),
+      foot(`خصومات ${iqd(s.sums.discounts)} · ضيافة ${iqd(s.sums.hospitality)}`, `${s.sums.voids} ملغاة`, s.sums.voids ? 'bad' : 'ok'))}
+
+    ${card('👥', 'الموظفون والحضور',
+      more('staff', s.staff
+        .sort((a, b) => (b.l > 0) - (a.l > 0) || (a.k === 'present' ? 0 : 1) - (b.k === 'present' ? 0 : 1))
+        .map((p) => p.k === 'present'
+          ? `<li class="${p.l > 0 ? 'bad' : ''}"><span>${esc(p.n)}<small>دخل <span class="num">${esc(p.in)}</span>${p.out ? ` · خرج <span class="num">${esc(p.out)}</span>` : ''}${p.st ? ` · دوامه <span class="num">${esc(p.st)}</span>` : ''}</small></span>${p.l > 0 ? `<span class="tag bad">متأخر ${p.l} د</span>` : '<span class="tag ok">حاضر</span>'}</li>`
+          : `<li class="off"><span>${esc(p.n)}${p.st ? `<small>دوامه <span class="num">${esc(p.st)}</span></small>` : ''}</span><span class="tag">${p.k === 'leave' ? 'إجازة' : p.k === 'absent' ? 'غائب' : 'لم يحضر بعد'}</span></li>`), 'لا موظفين'),
+      foot(`حاضر ${present.length} من ${s.staff.length}`, lateStaff.length ? `${lateStaff.length} متأخر` : 'لا متأخرين', lateStaff.length ? 'bad' : 'ok'))}
+
+    ${s.drivers.length ? card('🛵', 'السائقون',
+      rows(s.drivers.map((r) => `<li><span>${esc(r.n)}<small>وصّل اليوم ${r.done} · معه الآن ${r.out}</small></span><b class="num">${iqd(r.due)}</b></li>`), ''),
+      foot('مال عند السائقين لم يُسلَّم', money(s.drivers.reduce((a, r) => a + r.due, 0))), '', 'المبلغ بجانب كل سائق: ما يجب أن يسلّمه للصندوق.') : ''}
+
+    ${card('📦', 'المخزن',
+      more('stock', [...lows, ...s.stock.items.filter((x) => !x.low)].map((x) => `<li class="${x.low ? 'bad' : ''}"><span>${esc(x.n)}<small>${x.low ? 'قارب على النفاد · ' : ''}قيمته <span class="num">${iqd(x.v)}</span> د.ع</small></span><b>${qty(x.q, x.u)}</b></li>`), 'لا مواد مسجّلة'),
+      foot(`قيمة المخزن كله${lows.length ? ` · ${lows.length} قاربت على النفاد` : ''}`, money(s.stock.value), lows.length ? 'bad' : ''))}
+
+    ${card('🛒', 'أمر الشراء لباجر',
+      more('buy', s.buy.lines.map((l) => `<li><span>${esc(l.n)}<small>${l.q} ${esc(l.u)}${l.s ? ` · من ${esc(l.s)}` : ''}</small></span><b class="num">${l.p === null ? '—' : iqd(l.p)}</b></li>`), 'لا يحتاج المطعم شراء شيء الآن'),
+      foot('المبلغ المتوقع دفعه تقريباً', money(s.buy.total)))}
+
+    ${card('📈', 'المبيعات',
+      `${rows([`<li><span>اليوم</span><b class="num">${iqd(s.sales.day)}</b></li>`, `<li><span>آخر 7 أيام</span><b class="num">${iqd(s.sales.week)}</b></li>`, `<li><span>هذا الشهر</span><b class="num">${iqd(s.sales.month)}</b></li>`], '')}
+      <div class="bars">${s.sales.bars.map((w, i) => `<div class="bar ${i === s.sales.bars.length - 1 ? 'today' : ''}"><i style="height:${Math.round((w.s / max) * 100)}%"></i><span>${DAYS[new Date(w.d + 'T12:00').getDay()]}</span></div>`).join('')}</div>`,
+      foot('مبيعات الشهر حتى اليوم', money(s.sales.month)))}
+
+    ${card('🧮', 'حساب الشهر',
+      rows([
+        `<li><span>المبيعات</span><b class="num">${iqd(m.sales)}</b></li>`,
+        `<li><span>كلفة المواد</span><b class="num out">${iqd(m.cost)}</b></li>`,
+        `<li><span>الرواتب</span><b class="num out">${iqd(m.wages)}</b></li>`,
+        `<li><span>الإيجار والمصاريف الثابتة</span><b class="num out">${iqd(m.fixed)}</b></li>`,
+        `<li><span>مصاريف التشغيل المسجّلة</span><b class="num out">${iqd(m.running)}</b></li>`
+      ], ''),
+      foot('صافي الربح المتوقع', money(m.profit), m.profit >= 0 ? 'ok' : 'bad'), '', 'تقديري: الرواتب والمصاريف الثابتة لشهر كامل، والمبيعات حتى اليوم.')}
+
+    ${card('📒', 'الديون',
+      rows([
+        `<li><span>على الزبائن للمطعم</span><b class="num">${iqd(s.debts.customers)}</b></li>`,
+        `<li><span>على المطعم للموردين</span><b class="num">${iqd(s.debts.suppliers)}</b></li>`
+      ], ''),
+      foot(s.debts.customers >= s.debts.suppliers ? 'الفرق لصالح المطعم' : 'الفرق على المطعم', money(Math.abs(s.debts.customers - s.debts.suppliers)), s.debts.customers >= s.debts.suppliers ? 'ok' : 'bad'))}
+
     <button class="quiet" id="out">تغيير الرمز</button>`
+  for (const k of opened) document.querySelector(`details[data-k="${k}"]`)?.setAttribute('open', '')
   $('out').onclick = () => (stored.set(''), location.reload())
 }
 
