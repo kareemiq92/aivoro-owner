@@ -150,7 +150,7 @@ function gate(error = '') {
     <input id="code" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go">
     <button id="go">افتح</button><div class="error">${esc(error)}</div></div>`
   $('go').onclick = () => { const c = $('code').value; if (clean(c).length !== 12) return gate('الرمز 12 حرفاً ورقماً.'); stored.set(c); start(c) }
-  $('code').onkeydown = (e) => e.key === 'Enter' && $('go').click()
+  $('code').onkeydown = (e) => { if (e.key === 'Enter') $('go').click() }
 }
 
 function render(s) {
